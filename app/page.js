@@ -1,57 +1,145 @@
 "use client";
+import { useState, useEffect } from "react";
+import RepoTile from "@/components/repo/RepoTile";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import SearchBar from "@/components/SearchBar";
 
 export default function HomePage() {
+  const [repos, setRepos] = useState([]);
+  const [page, setPage] = useState(1);
+  const perPage = 18;
+
+  const totalPages = Math.max(1, Math.ceil(repos.length / perPage));
+  const visible = repos.slice((page - 1) * perPage, page * perPage);
+
+  // fallback demo repos (only used if API fails completely)
+  const fallbackRepos = [
+    {
+      name: "vercel/next.js",
+      description: "The React framework for the web.",
+      stargazers_count: 125000,
+      forks_count: 27000,
+      language: "JavaScript",
+      topics: ["react", "framework", "ssr"],
+      license: { spdx_id: "MIT" },
+      html_url: "https://github.com/vercel/next.js",
+    },
+    {
+      name: "supabase/supabase",
+      description: "The open source Firebase alternative.",
+      stargazers_count: 70000,
+      forks_count: 6000,
+      language: "TypeScript",
+      topics: ["database", "auth", "storage"],
+      license: { spdx_id: "Apache-2.0" },
+      html_url: "https://github.com/supabase/supabase",
+    },
+    {
+      name: "Repo 3",
+      description: "Minimal example.",
+      stargazers_count: 1200,
+      forks_count: 200,
+      language: "Python",
+      topics: ["ai", "ml"],
+      html_url: "#",
+    },
+    {
+      name: "Repo 4",
+      description: "Another example.",
+      stargazers_count: 950,
+      forks_count: 80,
+      language: "Go",
+      topics: ["cli"],
+      html_url: "#",
+    },
+  ];
+
+  // random dev jokes/puns/quotes
+  const devQuotes = [
+    "Code is like humor. When you have to explain it, it’s bad.",
+    "Why do programmers prefer dark mode? Because light attracts bugs.",
+    "In a world without fences and walls, who needs Gates and k Windows?",
+    "There are two hard things in computer science: cache invalidation and naming things.",
+    "Programming isn’t about what you know; it’s about what you can figure out.",
+  ];
+  const [quote, setQuote] = useState("");
+
+  useEffect(() => {
+    const random = devQuotes[Math.floor(Math.random() * devQuotes.length)];
+    setQuote(random);
+  }, []);
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black text-white">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center text-center py-20">
+    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-satoshi">
+      {/* HERO */}
+      <section className="border-b border-[rgba(255,255,255,0.06)] py-12 text-center">
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent"
+          transition={{ duration: 0.45 }}
+          className="hero-heading"
         >
-          Discover the Best Open Source Repos
+          Discover Open Source Gems
         </motion.h1>
-        <p className="mt-4 text-lg text-zinc-400 max-w-2xl">
-          Search trending GitHub projects and explore what’s hot in open source.
+
+        <p className="mt-4 text-muted max-w-2xl mx-auto">
+          Search trending GitHub repositories and explore what’s hot in open
+          source.
         </p>
 
-        {/* Search Bar */}
-        <div className="relative mt-8 w-full max-w-xl">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-zinc-500" />
-          <input
-            type="text"
-            placeholder="Search repositories..."
-            className="w-full pl-10 pr-4 py-3 rounded-full bg-zinc-800 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-        </div>
+        {/* SearchBar drives repos state */}
+        <SearchBar onResults={setRepos} fallbackRepos={fallbackRepos} />
+
+        {/* Dev Quote / Joke */}
+        {quote && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-16 text-2xl font-clash text-[var(--foreground)]"
+          >
+            {quote}
+          </motion.p>
+        )}
       </section>
 
-      {/* Trending Section */}
+      {/* Repo boxes */}
       <section className="max-w-6xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-          🔥 Trending Repositories
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {["Repo 1", "Repo 2", "Repo 3", "Repo 4"].map((repo, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ y: -4 }}
-              className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 shadow hover:shadow-lg transition"
-            >
-              <h3 className="text-lg font-semibold">{repo}</h3>
-              <p className="text-sm text-zinc-400 mt-2">
-                Short description of {repo} goes here.
-              </p>
-              <div className="flex gap-3 mt-4 text-sm text-zinc-500">
-                ⭐ 1.2k · ⑂ 200
+        {repos.length === 0 ? (
+          <p className="text-center text-muted">No repositories to show.</p>
+        ) : (
+          <>
+            <div className="repo-boxes">
+              {visible.map((r, i) => (
+                <RepoTile key={i} repo={r} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-6 mt-12">
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="button border-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ← Prev
+                </button>
+                <span className="text-muted text-sm">
+                  Page <span className="text-[var(--foreground)]">{page}</span>{" "}
+                  / {totalPages}
+                </span>
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="button disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next →
+                </button>
               </div>
-            </motion.div>
-          ))}
-        </div>
+            )}
+          </>
+        )}
       </section>
     </main>
   );
