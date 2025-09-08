@@ -2,7 +2,14 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, GitFork, ChevronDown, ExternalLink, Circle, ArrowRight } from "lucide-react"; // 1. Import ArrowRight icon
+import {
+  Star,
+  GitFork,
+  ChevronDown,
+  ExternalLink,
+  Circle,
+  ArrowRight,
+} from "lucide-react"; // 1. Import ArrowRight icon
 import Link from "next/link"; // 2. Import the Next.js Link component
 
 function k(n) {
@@ -14,13 +21,16 @@ function k(n) {
 
 export default function RepoTile({ repo }) {
   const [open, setOpen] = useState(false);
-  const toggle = useCallback(() => setOpen(v => !v), []);
-  const onKey = useCallback((e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggle();
-    }
-  }, [toggle]);
+  const toggle = useCallback(() => setOpen((v) => !v), []);
+  const onKey = useCallback(
+    (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggle();
+      }
+    },
+    [toggle]
+  );
 
   const {
     name,
@@ -33,7 +43,8 @@ export default function RepoTile({ repo }) {
     language,
     topics = [],
     license,
-    html_url
+    html_url,
+    match_score,
   } = repo || {};
 
   const displayName = name || full_name || "repository";
@@ -53,6 +64,23 @@ export default function RepoTile({ repo }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="repo-box-title font-clash truncate">{displayName}</h3>
+          <div
+            className="flex items-center gap-2"
+            title="How well this project matches criteria for new contributors (size, activity, complexity)."
+          >
+            <span
+              className={`font-clash text-lg ${
+                match_score >= 7
+                  ? "text-green-400"
+                  : match_score >= 4
+                  ? "text-yellow-400"
+                  : "text-red-400"
+              }`}
+            >
+              {match_score}/10
+            </span>
+            <span className="text-xs text-muted-foreground">Match Score</span>
+          </div>
           <div className="mt-2 text-muted text-sm flex flex-wrap items-center gap-4">
             <span className="inline-flex items-center gap-1">
               <Star size={16} /> {k(starCount)}
@@ -117,14 +145,14 @@ export default function RepoTile({ repo }) {
                 >
                   Open on GitHub <ExternalLink size={16} />
                 </a>
-                
+
                 {/* 3. ADDED THIS LINK TO THE DETAIL PAGE */}
                 <Link
                   href={`/repo/${full_name}`}
                   className="btn-accent inline-flex items-center gap-1 text-sm" // Using the accent style from your CSS
                   onClick={(e) => e.stopPropagation()} // Stop propagation to prevent the tile from closing
                 >
-                    Details <ArrowRight size={16} />
+                  Details <ArrowRight size={16} />
                 </Link>
               </div>
             </div>

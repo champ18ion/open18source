@@ -233,9 +233,21 @@ body {
 .repo-box:hover .repo-box-title {
   color: var(--background);
 }
+
 .repo-box.active {
   background-color: rgba(var(--accent-r), 0.06);
   border-color: rgba(var(--accent-r), 0.14);
+}
+
+/* Make the hover on an expanded tile a bit darker, not white */
+.repo-box.active:hover {
+  background-color: rgba(var(--accent-r), 0.12);
+  border-color: rgba(var(--accent-r), 0.22);
+}
+
+/* And critically, keep the text white on that darker hover */
+.repo-box.active:hover .repo-box-title {
+  color: var(--foreground);
 }
 
 

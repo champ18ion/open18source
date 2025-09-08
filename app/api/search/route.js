@@ -13,6 +13,30 @@ import { NextResponse } from "next/server";
  * - per_page: number (1..100; default 20)
  * - page: number (>=1; default 1)
  */
+
+
+function calculateMatchScore(repo) {
+  let score = 10.0;
+  // Use metrics available in the search API response:
+  // `size` (in KB), `open_issues_count`, `stargazers_count`, `pushed_at`
+
+  // 1. Penalize large codebases (harder to learn)
+  if (repo.size > 50000) score -= Math.min(4, (repo.size - 50000) / 25000);
+
+  // 2. Penalize massive, complex projects (intimidating)
+  if (repo.stargazers_count > 50000) score -= 3;
+  else if (repo.stargazers_count > 10000) score -= 1.5;
+
+  // 3. Penalize potentially neglected projects
+  if (repo.open_issues_count > 500) score -= 2;
+  const pushDate = new Date(repo.pushed_at);
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  if (pushDate < sixMonthsAgo) score = 0; // Inactive repo is a 0 match
+
+  return Math.max(0, Math.round(score * 10) / 10);
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -85,24 +109,33 @@ export async function GET(request) {
     const data = await res.json();
 
     // Normalize items (keep it small; topics may be missing for some repos)
-    const items = Array.isArray(data.items) ? data.items.map(repo => ({
-      id: repo.id,
-      full_name: repo.full_name,
-      name: repo.name,
-      html_url: repo.html_url,
-      description: repo.description,
-      language: repo.language,
-      topics: repo.topics || [],
-      stargazers_count: repo.stargazers_count,
-      forks_count: repo.forks_count,
-      open_issues_count: repo.open_issues_count,
-      pushed_at: repo.pushed_at,
-      owner: {
-        login: repo.owner?.login,
-        avatar_url: repo.owner?.avatar_url,
-        html_url: repo.owner?.html_url,
-      },
-    })) : [];
+// This is the corrected version
+const items = Array.isArray(data.items) ? data.items.map(repo => { // Use { instead of ({
+  // Now you can have statements inside the function body
+  const matchScore = calculateMatchScore(repo);
+
+  // And you must explicitly return the object
+  return {
+    id: repo.id,
+    full_name: repo.full_name,
+    name: repo.name,
+    html_url: repo.html_url,
+    description: repo.description,
+    language: repo.language,
+    topics: repo.topics || [],
+    stargazers_count: repo.stargazers_count,
+    forks_count: repo.forks_count,
+    open_issues_count: repo.open_issues_count,
+    pushed_at: repo.pushed_at,
+    owner: {
+      login: repo.owner?.login,
+      avatar_url: repo.owner?.avatar_url,
+      html_url: repo.owner?.html_url,
+    },
+    match_score: matchScore,
+  };
+}) : [];
+    
 
     return NextResponse.json({
       ok: true,

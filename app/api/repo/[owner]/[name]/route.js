@@ -127,6 +127,56 @@ import { NextResponse } from "next/server";
 
 const GH = "https://api.github.com";
 
+// Add this new helper function inside the file
+async function getContributionHealth(owner, name) {
+  // --- INTEGRATION POINT ---
+  // Use Promise.allSettled to avoid one failure killing the whole page
+  const [mergedPrsResult, fileCheckResults] = await Promise.all([
+    // 1. Get recent merged PRs to check responsiveness
+    fetch(`${GH}/search/issues?q=repo:${owner}/${name}+is:pr+is:merged&sort=updated&per_page=20`, { headers: ghHeaders() }),
+    // 2. Check for onboarding files in parallel
+    Promise.allSettled([
+      fetch(`${GH}/repos/${owner}/${name}/contents/CONTRIBUTING.md`, { headers: ghHeaders() }),
+      fetch(`${GH}/repos/${owner}/${name}/contents/Dockerfile`, { headers: ghHeaders() }),
+      fetch(`${GH}/repos/${owner}/${name}/contents/docker-compose.yml`, { headers: ghHeaders() }),
+    ])
+  ]);
+
+  // --- Analyze Responsiveness ---
+  let responsiveness = { score: 5, message: "Average maintainer responsiveness." };
+  if (mergedPrsResult.ok) {
+    const prs = await mergedPrsResult.json();
+    if (prs.items && prs.items.length > 0) {
+      const durations = prs.items.map(pr => new Date(pr.closed_at).getTime() - new Date(pr.created_at).getTime());
+      const avgDurationMs = durations.reduce((a, b) => a + b, 0) / durations.length;
+      const avgDays = avgDurationMs / (1000 * 60 * 60 * 24);
+      
+      if (avgDays < 3) {
+        responsiveness = { score: 10, message: `Excellent responsiveness. PRs are merged in ~${Math.round(avgDays * 24)} hours on average.` };
+      } else if (avgDays < 7) {
+        responsiveness = { score: 8, message: `Good responsiveness. PRs are merged in ~${Math.round(avgDays)} days on average.` };
+      } else {
+        responsiveness = { score: 4, message: `Slow responsiveness. PRs take over a week (${Math.round(avgDays)} days) to merge.` };
+      }
+    }
+  }
+
+  // --- Analyze Onboarding ---
+  let onboarding = { score: 3, message: "No standard contribution or setup files found." };
+  const hasContributing = fileCheckResults[0].status === 'fulfilled' && fileCheckResults[0].value.ok;
+  const hasDockerfile = fileCheckResults[1].status === 'fulfilled' && fileCheckResults[1].value.ok;
+  const hasDockerCompose = fileCheckResults[2].status === 'fulfilled' && fileCheckResults[2].value.ok;
+
+  if (hasContributing && (hasDockerfile || hasDockerCompose)) {
+    onboarding = { score: 10, message: "Excellent onboarding. Found a CONTRIBUTING guide and a one-step Docker setup." };
+  } else if (hasContributing) {
+    onboarding = { score: 7, message: "Good onboarding. A CONTRIBUTING.md guide was found." };
+  }
+
+  return { responsiveness, onboarding };
+}
+
+
 /**
  * Generates the necessary headers for making requests to the GitHub API.
  */
@@ -199,7 +249,7 @@ async function listRepositoryIssues(owner, name, queryParams = {}) {
 }
 
 export async function GET(_req, { params }) {
-  const { owner, name } = params;
+  const { owner, name } = await params;
 
   try {
     const repoRes = await fetch(`${GH}/repos/${owner}/${name}`, { headers: ghHeaders(), cache: "no-store" });
@@ -221,6 +271,7 @@ export async function GET(_req, { params }) {
       hwResult,
       bugResult,
       recentResult,
+      healthData
     ] = await Promise.all([
       fetch(`${GH}/repos/${owner}/${name}/readme`, { headers: ghHeaders(), cache: "no-store" }),
       fetch(`${GH}/repos/${owner}/${name}/contents/CONTRIBUTING.md`, { headers: ghHeaders(), cache: "no-store" }),
@@ -231,6 +282,7 @@ export async function GET(_req, { params }) {
       listRepositoryIssues(owner, name, { labels: "help wanted,help-wanted", per_page: 5 }),
       listRepositoryIssues(owner, name, { labels: "bug,kind/bug,type/bug", per_page: 5 }),
       listRepositoryIssues(owner, name, { assignee: "none", sort: "updated", per_page: 5 }),
+      getContributionHealth(owner, name), // <-- Add it here
     ]);
 
     const hasContributing = contribRes.ok;
@@ -266,6 +318,7 @@ export async function GET(_req, { params }) {
       help_wanted_issues: hwResult.map(normalize),
       bug_issues: bugResult.map(normalize),
       recent_issues: recentResult.map(normalize),
+      contribution_health: healthData,
     };
 
     const res = NextResponse.json(payload);

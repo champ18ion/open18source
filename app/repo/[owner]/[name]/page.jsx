@@ -183,6 +183,7 @@ import { Star, GitFork, ExternalLink, ChevronLeft, CheckCircle, GitPullRequest, 
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
+import ContributionHealth from "@/components/repo/ContributionHealth";
 
 /**
  * Helper to format large numbers into a compact "k" format.
@@ -257,7 +258,7 @@ export default function RepoDetailPage() {
   // --- Contribution Hierarchy Logic ---
   let issueContent;
   if (repo.good_first_issues?.length > 0) {
-    issueContent = ( <> <p className="text-muted-foreground mb-6 text-sm">Based on our analysis, the best place to start is with one of these issues marked as ideal for newcomers.</p> <div className="card divide-y divide-[rgba(255,255,255,0.04)]"> {repo.good_first_issues.map(issue => <IssueCard key={issue.id} issue={issue} />)} </div> </> );
+    issueContent = ( <> <p className="text-muted-foreground   mb-6 text-sm">Based on our analysis, the best place to start is with one of these issues marked as ideal for newcomers.</p> <div className="card divide-y divide-[rgba(255,255,255,0.04)]"> {repo.good_first_issues.map(issue => <IssueCard key={issue.id} issue={issue} />)} </div> </> );
   } else if (repo.help_wanted_issues?.length > 0) {
     issueContent = ( <> <p className="text-muted-foreground mb-6 text-sm">This project is actively looking for help. Check out these issues to see where you can make an impact.</p> <div className="card divide-y divide-[rgba(255,255,255,0.04)]"> {repo.help_wanted_issues.map(issue => <IssueCard key={issue.id} issue={issue} />)} </div> </> );
   } else if (repo.bug_issues?.length > 0) {
@@ -295,6 +296,7 @@ export default function RepoDetailPage() {
               {repo.has_contributing && ( <div className="flex items-start gap-3"> <CheckCircle size={18} className="mt-1 text-primary flex-shrink-0"/> <div> <h4 className="font-clash">Read the Guidelines</h4> <p className="text-sm text-muted-foreground">The project has a <a href={`${repo.html_url}/blob/master/CONTRIBUTING.md`} target="_blank" rel="noopener noreferrer" className="text-primary underline">CONTRIBUTING.md</a> file.</p> </div> </div> )}
               <div className="flex items-start gap-3"> <GitPullRequest size={18} className="mt-1 text-primary flex-shrink-0"/> <div> <h4 className="font-clash">Pick an Issue</h4> <p className="text-sm text-muted-foreground">Choose a task from the left, comment to claim it, and start coding.</p> </div> </div>
             </div>
+            <ContributionHealth health={repo.contribution_health} />
             {repo.topics?.length > 0 && ( <> <h2 className="section-title mt-8">Topics</h2> <div className="flex flex-wrap gap-2"> {repo.topics.map(topic => ( <span key={topic} className="text-xs font-satoshi text-muted-foreground bg-secondary px-2 py-1 rounded-sm">{topic}</span> ))} </div> </> )}
           </motion.div>
         </div>
