@@ -1,8 +1,9 @@
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata = {
   title: "Open18Source",
-  description: "Your app description",
+  description: "For developers willing to do their first open-source contribution",
 };
 
 export default function RootLayout({ children }) {
@@ -13,6 +14,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className="antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );
