@@ -7,71 +7,12 @@
    - Network:      http://192.168.0.2:3000
 
  ✓ Starting...
- ✓ Ready in 1078ms
- ○ Compiling / ...
- ✓ Compiled / in 6.3s
- GET / 200 in 7637ms
- ○ Compiling /api/trending ...
- ✓ Compiled /api/trending in 699ms
- GET /api/trending?timeframe=daily 200 in 1151ms
- GET /api/trending?timeframe=weekly 200 in 296ms
+ ✓ Ready in 1456ms
  ○ Compiling /repo/[owner]/[name] ...
- ✓ Compiled /repo/[owner]/[name] in 534ms
-Error: Route "/repo/[owner]/[name]" used `params.owner`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at RepoPage (app/repo/[owner]/[name]/page.js:14:11)
-  12 |
-  13 | export default async function RepoPage({ params }) {
-> 14 |   const { owner, name } = params;
-     |           ^
-  15 |
-  16 |   // Fetch basic repo details
-  17 |   const repoRes = await fetch(`https://api.github.com/repos/${owner}/${name}`, {
-Error: Route "/repo/[owner]/[name]" used `params.name`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at RepoPage (app/repo/[owner]/[name]/page.js:14:18)
-  12 |
-  13 | export default async function RepoPage({ params }) {
-> 14 |   const { owner, name } = params;
-     |                  ^
-  15 |
-  16 |   // Fetch basic repo details
-  17 |   const repoRes = await fetch(`https://api.github.com/repos/${owner}/${name}`, {
-Error: Route "/repo/[owner]/[name]" used `params.owner`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at Module.generateMetadata (app/repo/[owner]/[name]/page.js:6:11)
-  4 |
-  5 | export async function generateMetadata({ params }) {
-> 6 |   const { owner, name } = params;
-    |           ^
-  7 |   return {
-  8 |     title: `${owner}/${name} | Open18source`,
-  9 |     description: `View stats and details for ${owner}/${name} on GitHub.`,
-Error: Route "/repo/[owner]/[name]" used `params.name`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at Module.generateMetadata (app/repo/[owner]/[name]/page.js:6:18)
-  4 |
-  5 | export async function generateMetadata({ params }) {
-> 6 |   const { owner, name } = params;
-    |                  ^
-  7 |   return {
-  8 |     title: `${owner}/${name} | Open18source`,
-  9 |     description: `View stats and details for ${owner}/${name} on GitHub.`,
- GET /repo/facebook/react 200 in 2838ms
- ○ Compiling /topics/[topic] ...
- ✓ Compiled /topics/[topic] in 752ms
-Error: Route "/topics/[topic]" used `params.topic`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at TopicPage (app/topics/[topic]/page.js:14:11)
-  12 |
-  13 | export default async function TopicPage({ params }) {
-> 14 |   const { topic } = params;
-     |           ^
-  15 |
-  16 |   // Fetch repos for this topic
-  17 |   const ghUrl = new URL("https://api.github.com/search/repositories");
-Error: Route "/topics/[topic]" used `params.topic`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at Module.generateMetadata (app/topics/[topic]/page.js:6:11)
-  4 |
-  5 | export async function generateMetadata({ params }) {
-> 6 |   const { topic } = params;
-    |           ^
-  7 |   return {
-  8 |     title: `Top Open Source ${topic} Projects | Open18source`,
-  9 |     description: `Discover the best open-source ${topic} repositories on GitHub.`,
- GET /topics/react 200 in 2185ms
+ ✓ Compiled /repo/[owner]/[name] in 8.5s
+ GET /repo/facebook/react 200 in 10151ms
+ ○ Compiling /api/repo/[owner]/[name] ...
+ ✓ Compiled /api/repo/[owner]/[name] in 614ms
+ GET /api/repo/facebook/react 200 in 2048ms
+ GET /repo/facebook/react 200 in 271ms
+ GET /api/repo/facebook/react 200 in 1219ms

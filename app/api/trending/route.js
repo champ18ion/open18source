@@ -1,5 +1,6 @@
 // app/api/trending/route.js
 import { NextResponse } from "next/server";
+import { calculateMatchScore } from "@/lib/utils";
 
 export async function GET(request) {
   try {
@@ -40,6 +41,7 @@ export async function GET(request) {
     const data = await res.json();
 
     const items = Array.isArray(data.items) ? data.items.map(repo => {
+      const matchScore = calculateMatchScore(repo);
       return {
         id: repo.id,
         full_name: repo.full_name,
@@ -57,6 +59,7 @@ export async function GET(request) {
           avatar_url: repo.owner?.avatar_url,
           html_url: repo.owner?.html_url,
         },
+        match_score: matchScore,
       };
     }) : [];
 

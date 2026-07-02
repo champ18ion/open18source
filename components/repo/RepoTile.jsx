@@ -135,25 +135,24 @@ export default function RepoTile({ repo }) {
                 </div>
               )}
 
-              <div className="mt-4 flex items-center justify-between gap-2">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                <Link
+                  href={`/repo/${full_name}`}
+                  className="btn-accent inline-flex items-center gap-2 text-sm px-4 py-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View Project Insights <ArrowRight size={16} />
+                </Link>
+
                 <a
                   href={html_url || "#"}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn inline-flex items-center gap-1"
+                  className="btn inline-flex items-center gap-1 text-xs"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  Open on GitHub <ExternalLink size={16} />
+                  GitHub <ExternalLink size={14} />
                 </a>
-
-                {/* 3. ADDED THIS LINK TO THE DETAIL PAGE */}
-                <Link
-                  href={`/repo/${full_name}`}
-                  className="btn-accent inline-flex items-center gap-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" // Using the accent style from your CSS
-                  onClick={(e) => e.stopPropagation()} // Stop propagation to prevent the tile from closing
-                >
-                  Details <ArrowRight size={16} />
-                </Link>
               </div>
             </div>
           </motion.div>

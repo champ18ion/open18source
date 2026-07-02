@@ -192,14 +192,14 @@ export default function SearchBar({ onResults, fallbackRepos }) {
 
       {/* Timeframe Toggles for Trending */}
       {!query && appliedFilters.language === "any" && appliedFilters.stars === 0 && !appliedFilters.difficulty && (
-        <div className="flex items-center gap-4 mt-2 mb-4 justify-center">
-           <span className="text-sm text-muted">Trending:</span>
-           <div className="flex bg-[rgba(255,255,255,0.06)] rounded-lg p-1">
+        <div className="flex items-center gap-2 mt-4 mb-8 justify-center">
+           <span className="text-sm text-muted mr-2">Trending:</span>
+           <div className="flex gap-2">
              {["daily", "weekly", "monthly"].map(t => (
                 <button
                    key={t}
                    onClick={() => setTimeframe(t)}
-                   className={`px-3 py-1 text-xs rounded-md capitalize ${timeframe === t ? "bg-[var(--foreground)] text-[var(--background)]" : "text-muted hover:text-[var(--foreground)]"}`}
+                   className={`px-4 py-1.5 rounded-full border text-xs font-medium transition-colors ${timeframe === t ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]" : "border-[rgba(255,255,255,0.1)] text-muted hover:text-[var(--foreground)] hover:border-[rgba(255,255,255,0.3)]"}`}
                 >
                    {t === "daily" ? "Today" : t === "weekly" ? "This Week" : "This Month"}
                 </button>
