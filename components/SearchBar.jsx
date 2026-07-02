@@ -22,6 +22,8 @@ export default function SearchBar({ onResults, fallbackRepos }) {
     sort: "match",
   });
 
+  const [timeframe, setTimeframe] = useState("daily"); // daily, weekly, monthly
+
   // Debounce text input to avoid API calls on every keystroke
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   useEffect(() => {
@@ -35,29 +37,31 @@ export default function SearchBar({ onResults, fallbackRepos }) {
        const hasActiveQuery = debouncedQuery.trim() !== "";
       const hasActiveFilters = appliedFilters.language !== "any" || appliedFilters.stars > 0 || appliedFilters.difficulty !== "";
 
-      // --- THIS IS THE KEY LOGIC ---
-      // If the user has cleared the search and filters, revert to the fallback/initial list.
-      if (!hasActiveQuery && !hasActiveFilters) {
-        onResults(fallbackRepos);
-        return; // Stop execution here
-      }
       setLoading(true);
 
       const params = new URLSearchParams();
-      if (debouncedQuery.trim()) params.set("q", debouncedQuery);
+      let isTrending = false;
 
-      // Use the correct API parameter names based on your backend route
-      if (appliedFilters.language !== "any") params.set("language", appliedFilters.language);
-      if (appliedFilters.stars > 0) params.set("starsMin", `${appliedFilters.stars}`);
-      if (appliedFilters.difficulty) params.set("goodFirstIssue", "true");
+      // If the user has cleared the search and filters, revert to trending feed.
+      if (!hasActiveQuery && !hasActiveFilters) {
+        params.set("timeframe", timeframe);
+        isTrending = true;
+      } else {
+        if (debouncedQuery.trim()) params.set("q", debouncedQuery);
 
-      // Send sort param to API only if it's a valid GitHub sort option
-      if (appliedFilters.sort !== 'match') {
-        params.set("sort", appliedFilters.sort);
+        // Use the correct API parameter names based on your backend route
+        if (appliedFilters.language !== "any") params.set("language", appliedFilters.language);
+        if (appliedFilters.stars > 0) params.set("starsMin", `${appliedFilters.stars}`);
+        if (appliedFilters.difficulty) params.set("goodFirstIssue", "true");
+
+        // Send sort param to API only if it's a valid GitHub sort option
+        if (appliedFilters.sort !== 'match') {
+          params.set("sort", appliedFilters.sort);
+        }
       }
 
       // If no params are set, use the trending endpoint; otherwise, use search
-       const endpoint = `/api/search?${params.toString()}`;
+       const endpoint = isTrending ? `/api/trending?${params.toString()}` : `/api/search?${params.toString()}`;
 
       try {
         const res = await fetch(endpoint);
@@ -67,12 +71,16 @@ export default function SearchBar({ onResults, fallbackRepos }) {
         let results = Array.isArray(data) ? data : data.items || [];
 
         // Perform client-side sorting if "Best Match" is selected
-        if (appliedFilters.sort === 'match' && Array.isArray(results)) {
+        if (!isTrending && appliedFilters.sort === 'match' && Array.isArray(results)) {
           // Sort by match_score descending, handling cases where score might be missing
           results.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
         }
 
-        onResults(results);
+        if (results.length === 0) {
+           onResults(fallbackRepos);
+        } else {
+           onResults(results);
+        }
       } catch (err) {
         console.error("Search failed → using fallback", err);
         onResults(fallbackRepos);
@@ -83,7 +91,7 @@ export default function SearchBar({ onResults, fallbackRepos }) {
 
     runSearch();
     // This dependency array is now correct AND safe because its props are stable
-  }, [debouncedQuery, appliedFilters, onResults, fallbackRepos]);
+  }, [debouncedQuery, appliedFilters, timeframe, onResults, fallbackRepos]);
 
   
 
@@ -179,6 +187,24 @@ export default function SearchBar({ onResults, fallbackRepos }) {
           >
             Apply Filters
           </button>
+        </div>
+      )}
+
+      {/* Timeframe Toggles for Trending */}
+      {!query && appliedFilters.language === "any" && appliedFilters.stars === 0 && !appliedFilters.difficulty && (
+        <div className="flex items-center gap-4 mt-2 mb-4 justify-center">
+           <span className="text-sm text-muted">Trending:</span>
+           <div className="flex bg-[rgba(255,255,255,0.06)] rounded-lg p-1">
+             {["daily", "weekly", "monthly"].map(t => (
+                <button
+                   key={t}
+                   onClick={() => setTimeframe(t)}
+                   className={`px-3 py-1 text-xs rounded-md capitalize ${timeframe === t ? "bg-[var(--foreground)] text-[var(--background)]" : "text-muted hover:text-[var(--foreground)]"}`}
+                >
+                   {t === "daily" ? "Today" : t === "weekly" ? "This Week" : "This Month"}
+                </button>
+             ))}
+           </div>
         </div>
       )}
 

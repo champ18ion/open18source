@@ -149,7 +149,7 @@ export default function RepoTile({ repo }) {
                 {/* 3. ADDED THIS LINK TO THE DETAIL PAGE */}
                 <Link
                   href={`/repo/${full_name}`}
-                  className="btn-accent inline-flex items-center gap-1 text-sm" // Using the accent style from your CSS
+                  className="btn-accent inline-flex items-center gap-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" // Using the accent style from your CSS
                   onClick={(e) => e.stopPropagation()} // Stop propagation to prevent the tile from closing
                 >
                   Details <ArrowRight size={16} />
