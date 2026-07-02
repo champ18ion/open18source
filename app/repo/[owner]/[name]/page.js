@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Star, GitFork, AlertCircle, Calendar, ExternalLink, Code } from "lucide-react";
+import { Star, GitFork, AlertCircle, Calendar, ExternalLink, Activity, Users, Lightbulb } from "lucide-react";
 import Link from "next/link";
 
 export async function generateMetadata({ params }) {
@@ -68,12 +68,12 @@ export default async function RepoPage({ params }) {
 
               <div className="flex flex-col gap-3 min-w-[200px]">
                  <a
-                    href={`https://gitpod.io/#${repo.html_url}`}
+                    href={`${repo.html_url}/contribute`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-medium px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/25"
+                    className="flex items-center justify-center gap-2 bg-[var(--foreground)] hover:bg-gray-200 text-[var(--background)] font-medium px-6 py-3 rounded-xl transition-colors"
                  >
-                    <Code size={18} /> Code in Browser
+                    <Users size={18} /> Start Contributing
                  </a>
                  <a
                     href={repo.html_url}
@@ -99,6 +99,67 @@ export default async function RepoPage({ params }) {
               ))}
            </div>
         </header>
+
+        {/* USP: Contributor Insights Section */}
+        <section className="mb-12">
+           <h2 className="text-2xl font-bold font-clash mb-6 flex items-center gap-2">
+              <Lightbulb className="text-yellow-400" /> Contributor Insights
+           </h2>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Insight 1: Activity Level */}
+              <div className="bg-gradient-to-br from-[rgba(255,255,255,0.05)] to-[rgba(255,255,255,0.02)] p-6 rounded-2xl border border-[rgba(255,255,255,0.1)]">
+                 <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-green-500/20 rounded-lg">
+                       <Activity className="text-green-400" size={20} />
+                    </div>
+                    <h3 className="font-semibold text-lg">Contribution Guide</h3>
+                 </div>
+                 <div className="text-muted text-sm leading-relaxed">
+                   <ul className="list-disc pl-5 text-muted space-y-2">
+                     <li>Fork the repository on GitHub</li>
+                     <li>Clone your fork locally</li>
+                     <li>Create a feature branch</li>
+                     <li>Make changes and commit with clear messages</li>
+                     <li>Push and open a Pull Request 🎉</li>
+                   </ul>
+                 </div>
+              </div>
+
+              {/* Insight 2: Community Size */}
+              <div className="bg-gradient-to-br from-[rgba(255,255,255,0.05)] to-[rgba(255,255,255,0.02)] p-6 rounded-2xl border border-[rgba(255,255,255,0.1)]">
+                 <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                       <Users className="text-blue-400" size={20} />
+                    </div>
+                    <h3 className="font-semibold text-lg">Project Health & Size</h3>
+                 </div>
+                 <p className="text-muted text-sm leading-relaxed mb-4">
+                    {repo.forks_count > 1000
+                       ? "Massive community. Expect strict contribution guidelines but high prestige."
+                       : "Growing community. Great opportunity to make a noticeable impact and build relationships."}
+                 </p>
+                 <p className="text-muted text-sm leading-relaxed">
+                    {repo.open_issues_count > 500
+                       ? "High volume of open issues. Might take longer to get PRs reviewed, but lots of areas to help."
+                       : "Manageable issue queue. Maintainers are likely responsive to new contributions and PRs."}
+                 </p>
+              </div>
+
+              {/* Insight 3: Tech Match */}
+              <div className="bg-gradient-to-br from-[rgba(255,255,255,0.05)] to-[rgba(255,255,255,0.02)] p-6 rounded-2xl border border-[rgba(255,255,255,0.1)]">
+                 <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                       <Star className="text-purple-400" size={20} />
+                    </div>
+                    <h3 className="font-semibold text-lg">Tech Stack</h3>
+                 </div>
+                 <p className="text-muted text-sm leading-relaxed">
+                    Primary language is <span className="font-bold text-[var(--foreground)]">{repo.language || "unspecified"}</span>.
+                    {repo.topics?.length > 0 && ` Key topics include ${repo.topics.slice(0, 3).join(", ")}.`}
+                 </p>
+              </div>
+           </div>
+        </section>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">

@@ -9,7 +9,6 @@ import {
   ExternalLink,
   Circle,
   ArrowRight,
-  Code,
 } from "lucide-react"; // 1. Import ArrowRight icon
 import Link from "next/link"; // 2. Import the Next.js Link component
 
@@ -136,24 +135,23 @@ export default function RepoTile({ repo }) {
                 </div>
               )}
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                 <Link
                   href={`/repo/${full_name}`}
-                  className="btn-accent inline-flex items-center gap-1 text-sm px-4 py-2"
+                  className="btn-accent inline-flex items-center gap-2 text-sm px-4 py-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  View Details <ArrowRight size={16} />
+                  View Project Insights <ArrowRight size={16} />
                 </Link>
 
                 <a
-                  href={`https://gitpod.io/#${html_url}`}
+                  href={html_url || "#"}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-lg bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] transition-colors"
+                  className="btn inline-flex items-center gap-1 text-xs"
                   onClick={(e) => e.stopPropagation()}
-                  title="Open this repository in a ready-to-code cloud environment"
                 >
-                  <Code size={16} /> Start Coding
+                  GitHub <ExternalLink size={14} />
                 </a>
               </div>
             </div>
