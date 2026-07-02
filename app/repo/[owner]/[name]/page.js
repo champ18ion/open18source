@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Star, GitFork, AlertCircle, Calendar } from "lucide-react";
+import { Star, GitFork, AlertCircle, Calendar, ExternalLink, Code } from "lucide-react";
 import Link from "next/link";
 
 export async function generateMetadata({ params }) {
@@ -55,7 +55,7 @@ export default async function RepoPage({ params }) {
 
         {/* Header section */}
         <header className="mb-12 border-b border-[rgba(255,255,255,0.1)] pb-8">
-           <div className="flex items-start justify-between">
+           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div>
                  <h1 className="text-3xl font-bold font-clash flex items-center gap-3">
                    <img src={repo.owner.avatar_url} alt={repo.owner.login} className="w-10 h-10 rounded-full" />
@@ -63,9 +63,27 @@ export default async function RepoPage({ params }) {
                       {repo.full_name}
                    </a>
                  </h1>
-                 <p className="mt-4 text-lg text-muted">{repo.description}</p>
+                 <p className="mt-4 text-lg text-muted max-w-2xl">{repo.description}</p>
               </div>
-              {/* Optional: Add a button to view on GitHub */}
+
+              <div className="flex flex-col gap-3 min-w-[200px]">
+                 <a
+                    href={`https://gitpod.io/#${repo.html_url}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-medium px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/25"
+                 >
+                    <Code size={18} /> Code in Browser
+                 </a>
+                 <a
+                    href={repo.html_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] text-white font-medium px-6 py-3 rounded-xl transition-colors"
+                 >
+                    <ExternalLink size={18} /> View on GitHub
+                 </a>
+              </div>
            </div>
 
            <div className="flex flex-wrap gap-4 mt-6">

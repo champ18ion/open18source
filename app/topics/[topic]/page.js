@@ -1,6 +1,7 @@
 import RepoTile from "@/components/repo/RepoTile";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { calculateMatchScore } from "@/lib/utils";
 
 export async function generateMetadata({ params }) {
   const { topic } = params;
@@ -34,7 +35,14 @@ export default async function TopicPage({ params }) {
   }
 
   const data = await res.json();
-  const repos = data.items || [];
+  const rawRepos = data.items || [];
+
+  const repos = rawRepos.map(repo => {
+    return {
+      ...repo,
+      match_score: calculateMatchScore(repo),
+    };
+  });
 
   return (
     <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] font-satoshi py-12">

@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Circle,
   ArrowRight,
+  Code,
 } from "lucide-react"; // 1. Import ArrowRight icon
 import Link from "next/link"; // 2. Import the Next.js Link component
 
@@ -135,25 +136,25 @@ export default function RepoTile({ repo }) {
                 </div>
               )}
 
-              <div className="mt-4 flex items-center justify-between gap-2">
-                <a
-                  href={html_url || "#"}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn inline-flex items-center gap-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Open on GitHub <ExternalLink size={16} />
-                </a>
-
-                {/* 3. ADDED THIS LINK TO THE DETAIL PAGE */}
+              <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link
                   href={`/repo/${full_name}`}
-                  className="btn-accent inline-flex items-center gap-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" // Using the accent style from your CSS
-                  onClick={(e) => e.stopPropagation()} // Stop propagation to prevent the tile from closing
+                  className="btn-accent inline-flex items-center gap-1 text-sm px-4 py-2"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Details <ArrowRight size={16} />
+                  View Details <ArrowRight size={16} />
                 </Link>
+
+                <a
+                  href={`https://gitpod.io/#${html_url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-lg bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Open this repository in a ready-to-code cloud environment"
+                >
+                  <Code size={16} /> Start Coding
+                </a>
               </div>
             </div>
           </motion.div>
